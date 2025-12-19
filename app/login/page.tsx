@@ -12,23 +12,59 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dumbbell } from "lucide-react"
 import { useState } from "react"
 import Link from "next/link"
+import { login } from "@/lib/actions/auth"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 export default function LoginPage() {
   const [studentEmail, setStudentEmail] = useState("")
   const [studentPassword, setStudentPassword] = useState("")
   const [adminEmail, setAdminEmail] = useState("")
   const [adminPassword, setAdminPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
 
-  const handleStudentLogin = (e: React.FormEvent) => {
+  const handleStudentLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("[v0] Student login:", { studentEmail, studentPassword })
-    // Placeholder for actual authentication
+    setIsLoading(true)
+
+    const formData = new FormData()
+    formData.append("email", studentEmail)
+    formData.append("password", studentPassword)
+
+    try {
+      await login(formData)
+      // login() will redirect, but we can show a toast first
+      toast.success("Welcome Back!", {
+        description: "Logging you in...",
+      })
+    } catch (error: any) {
+      toast.error("Login Failed", {
+        description: error.message || "Invalid credentials",
+      })
+      setIsLoading(false)
+    }
   }
 
-  const handleAdminLogin = (e: React.FormEvent) => {
+  const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("[v0] Admin login:", { adminEmail, adminPassword })
-    // Placeholder for actual authentication
+    setIsLoading(true)
+
+    const formData = new FormData()
+    formData.append("email", adminEmail)
+    formData.append("password", adminPassword)
+
+    try {
+      await login(formData)
+      toast.success("Admin Access Granted", {
+        description: "Logging you in...",
+      })
+    } catch (error: any) {
+      toast.error("Login Failed", {
+        description: error.message || "Invalid credentials",
+      })
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -84,17 +120,12 @@ export default function LoginPage() {
                         required
                       />
                     </div>
-                    <Button type="submit" className="w-full glow-effect">
-                      Sign In
+                    <Button type="submit" className="w-full glow-effect" disabled={isLoading}>
+                      {isLoading ? "Signing In..." : "Sign In"}
                     </Button>
-                    <div className="text-center text-sm">
-                      <a href="#" className="text-primary hover:underline">
-                        Forgot password?
-                      </a>
-                    </div>
                     <div className="text-center text-sm text-muted-foreground">
                       Don't have an account?{" "}
-                      <Link href="/signup" className="text-primary hover:underline font-semibold">
+                      <Link href="/" className="text-primary hover:underline font-semibold">
                         Sign up
                       </Link>
                     </div>
@@ -134,8 +165,8 @@ export default function LoginPage() {
                         required
                       />
                     </div>
-                    <Button type="submit" className="w-full bg-secondary hover:bg-secondary/90">
-                      Admin Sign In
+                    <Button type="submit" className="w-full bg-secondary hover:bg-secondary/90" disabled={isLoading}>
+                      {isLoading ? "Signing In..." : "Admin Sign In"}
                     </Button>
                   </form>
                 </CardContent>

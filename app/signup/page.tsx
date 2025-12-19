@@ -12,6 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dumbbell } from "lucide-react"
 import { useState } from "react"
 import Link from "next/link"
+import { signup } from "@/lib/actions/auth"
+import { toast } from "sonner"
+import { useRouter } from "next/navigation"
 
 export default function SignupPage() {
   const [studentName, setStudentName] = useState("")
@@ -23,16 +26,59 @@ export default function SignupPage() {
   const [adminPassword, setAdminPassword] = useState("")
   const [adminCode, setAdminCode] = useState("")
 
-  const handleStudentSignup = (e: React.FormEvent) => {
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleStudentSignup = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("[v0] Student signup:", { studentName, studentEmail, studentPassword, studentRegNo })
-    // Placeholder for actual registration
+    setIsLoading(true)
+
+    const formData = new FormData()
+    formData.append("fullName", studentName)
+    formData.append("email", studentEmail)
+    formData.append("password", studentPassword)
+    formData.append("registrationNumber", studentRegNo)
+    formData.append("role", "student")
+
+    const result = await signup(formData)
+
+    if (result.error) {
+      toast.error("Signup Failed", {
+        description: result.error,
+      })
+    } else {
+      toast.success("Account Created!", {
+        description: "Welcome to VIT Fitness Club. Redirecting to login...",
+      })
+      setTimeout(() => router.push("/login"), 1500)
+    }
+    setIsLoading(false)
   }
 
-  const handleAdminSignup = (e: React.FormEvent) => {
+  const handleAdminSignup = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("[v0] Admin signup:", { adminName, adminEmail, adminPassword, adminCode })
-    // Placeholder for actual registration
+    setIsLoading(true)
+
+    const formData = new FormData()
+    formData.append("fullName", adminName)
+    formData.append("email", adminEmail)
+    formData.append("password", adminPassword)
+    formData.append("registrationNumber", adminCode)
+    formData.append("role", "admin")
+
+    const result = await signup(formData)
+
+    if (result.error) {
+      toast.error("Signup Failed", {
+        description: result.error,
+      })
+    } else {
+      toast.success("Admin Account Created!", {
+        description: "Your admin account is ready. Redirecting to login...",
+      })
+      setTimeout(() => router.push("/login"), 1500)
+    }
+    setIsLoading(false)
   }
 
   return (
@@ -112,8 +158,8 @@ export default function SignupPage() {
                         required
                       />
                     </div>
-                    <Button type="submit" className="w-full glow-effect">
-                      Create Account
+                    <Button type="submit" className="w-full glow-effect" disabled={isLoading}>
+                      {isLoading ? "Creating Account..." : "Create Account"}
                     </Button>
                     <div className="text-center text-sm text-muted-foreground">
                       Already have an account?{" "}
@@ -181,8 +227,8 @@ export default function SignupPage() {
                         required
                       />
                     </div>
-                    <Button type="submit" className="w-full bg-secondary hover:bg-secondary/90">
-                      Create Admin Account
+                    <Button type="submit" className="w-full bg-secondary hover:bg-secondary/90" disabled={isLoading}>
+                      {isLoading ? "Creating Account..." : "Create Admin Account"}
                     </Button>
                     <div className="text-center text-sm text-muted-foreground">
                       Already have an account?{" "}

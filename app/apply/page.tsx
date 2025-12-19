@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { UserPlus } from "lucide-react"
 import { useState } from "react"
+import { submitApplication } from "@/lib/actions/applications"
+import { toast } from "sonner"
 
 export default function ApplyPage() {
   const [formData, setFormData] = useState({
@@ -25,10 +27,47 @@ export default function ApplyPage() {
     motivation: "",
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("Application submitted:", formData)
-    alert("Application submitted successfully! We'll get back to you soon.")
+    setIsLoading(true)
+
+    const formDataObj = new FormData()
+    formDataObj.append("fullName", formData.name)
+    formDataObj.append("email", formData.email)
+    formDataObj.append("phone", formData.phone)
+    formDataObj.append("registrationNumber", formData.registrationNumber)
+    formDataObj.append("branch", formData.branch)
+    formDataObj.append("year", formData.year)
+    formDataObj.append("fitnessGoal", formData.role)
+    formDataObj.append("experience", formData.experience)
+    formDataObj.append("whyJoin", formData.motivation)
+    formDataObj.append("availability", "weekdays")
+
+    const result = await submitApplication(formDataObj)
+
+    if (result.error) {
+      toast.error("Application Failed", {
+        description: result.error,
+      })
+    } else {
+      toast.success("Application Submitted!", {
+        description: "We'll review your application and get back to you soon.",
+      })
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        registrationNumber: "",
+        branch: "",
+        year: "",
+        role: "",
+        experience: "",
+        motivation: "",
+      })
+    }
+    setIsLoading(false)
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -210,8 +249,8 @@ export default function ApplyPage() {
                     </div>
                   </div>
 
-                  <Button type="submit" size="lg" className="w-full glow-effect">
-                    Submit Application
+                  <Button type="submit" size="lg" className="w-full glow-effect" disabled={isLoading}>
+                    {isLoading ? "Submitting..." : "Submit Application"}
                   </Button>
                 </form>
               </CardContent>

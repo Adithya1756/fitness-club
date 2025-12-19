@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,6 +12,8 @@ import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Activity, PlusCircle, Trash2, TrendingUp, Target, Flame, Calendar, CheckCircle2, Apple } from "lucide-react"
+import { logMeal, getDietLogs } from "@/lib/actions/diet"
+import { toast } from "sonner"
 
 export default function DietTrackerPage() {
   const [dailyGoals] = useState({
@@ -59,6 +61,29 @@ export default function DietTrackerPage() {
     fats: "",
   })
 
+  const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    const loadTodayLogs = async () => {
+      const today = new Date().toISOString().split("T")[0]
+      const result = await getDietLogs(today)
+      if (result.logs) {
+        setLoggedMeals(
+          result.logs.map((log: any) => ({
+            id: log.id,
+            name: log.food_item,
+            time: new Date(log.logged_at).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+            calories: log.calories,
+            protein: log.protein,
+            carbs: log.carbs,
+            fats: log.fat,
+          })),
+        )
+      }
+    }
+    loadTodayLogs()
+  }, [])
+
   const currentTotals = loggedMeals.reduce(
     (acc, meal) => ({
       calories: acc.calories + meal.calories,
@@ -76,19 +101,42 @@ export default function DietTrackerPage() {
     return "bg-red-500"
   }
 
-  const handleAddMeal = (e: React.FormEvent) => {
+  const handleAddMeal = async (e: React.FormEvent) => {
     e.preventDefault()
-    const meal = {
-      id: Date.now(),
-      name: newMeal.name,
-      time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
-      calories: Number.parseInt(newMeal.calories),
-      protein: Number.parseInt(newMeal.protein),
-      carbs: Number.parseInt(newMeal.carbs),
-      fats: Number.parseInt(newMeal.fats),
+    setIsLoading(true)
+
+    const formDataObj = new FormData()
+    formDataObj.append("mealTime", new Date().toLocaleTimeString())
+    formDataObj.append("foodItem", newMeal.name)
+    formDataObj.append("calories", newMeal.calories)
+    formDataObj.append("protein", newMeal.protein)
+    formDataObj.append("carbs", newMeal.carbs)
+    formDataObj.append("fat", newMeal.fats)
+    formDataObj.append("logDate", new Date().toISOString().split("T")[0])
+
+    const result = await logMeal(formDataObj)
+
+    if (result.error) {
+      toast.error("Failed to Log Meal", {
+        description: result.error,
+      })
+    } else {
+      const meal = {
+        id: Date.now(),
+        name: newMeal.name,
+        time: new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+        calories: Number.parseInt(newMeal.calories),
+        protein: Number.parseInt(newMeal.protein),
+        carbs: Number.parseInt(newMeal.carbs),
+        fats: Number.parseInt(newMeal.fats),
+      }
+      setLoggedMeals([...loggedMeals, meal])
+      setNewMeal({ name: "", calories: "", protein: "", carbs: "", fats: "" })
+      toast.success("Meal Logged!", {
+        description: `${newMeal.name} added to your daily tracker.`,
+      })
     }
-    setLoggedMeals([...loggedMeals, meal])
-    setNewMeal({ name: "", calories: "", protein: "", carbs: "", fats: "" })
+    setIsLoading(false)
   }
 
   const handleDeleteMeal = (id: number) => {
@@ -318,9 +366,9 @@ export default function DietTrackerPage() {
                       </div>
                     </div>
 
-                    <Button type="submit" className="w-full glow-effect">
+                    <Button type="submit" className="w-full glow-effect" disabled={isLoading}>
                       <PlusCircle className="mr-2 h-4 w-4" />
-                      Log Meal
+                      {isLoading ? "Logging..." : "Log Meal"}
                     </Button>
                   </form>
                 </CardContent>
