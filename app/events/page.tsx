@@ -140,7 +140,7 @@ export default function EventsPage() {
                         <MapPin className="h-4 w-4 text-primary" />
                         <span>{event.venue}</span>
                       </div>
-                      <Link href="/apply">
+                      <Link href="/register-event">
                         <Button className="w-full mt-4 glow-effect">Register Now</Button>
                       </Link>
                     </CardContent>

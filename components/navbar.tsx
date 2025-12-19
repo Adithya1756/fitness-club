@@ -31,7 +31,7 @@ export function Navbar() {
             </span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-5">
             <Link href="/" className="text-sm font-medium hover:text-primary transition-colors relative group">
               Home
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
@@ -45,14 +45,38 @@ export function Navbar() {
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
             </Link>
             <Link
+              href="/register-event"
+              className="text-sm font-medium hover:text-primary transition-colors relative group"
+            >
+              Register
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
+            </Link>
+            <Link
+              href="/diet-planner"
+              className="text-sm font-medium hover:text-primary transition-colors relative group"
+            >
+              Diet AI
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
+            </Link>
+            <Link
+              href="/canteen-menu"
+              className="text-sm font-medium hover:text-primary transition-colors relative group"
+            >
+              Menu
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
+            </Link>
+            <Link
+              href="/diet-tracker"
+              className="text-sm font-medium hover:text-primary transition-colors relative group"
+            >
+              Tracker
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
+            </Link>
+            <Link
               href="/leaderboard"
               className="text-sm font-medium hover:text-primary transition-colors relative group"
             >
               Leaderboard
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
-            </Link>
-            <Link href="/gallery" className="text-sm font-medium hover:text-primary transition-colors relative group">
-              Gallery
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full" />
             </Link>
             <Link href="/members" className="text-sm font-medium hover:text-primary transition-colors relative group">

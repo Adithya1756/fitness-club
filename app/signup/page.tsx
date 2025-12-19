@@ -70,7 +70,7 @@ export default function SignupPage() {
                       <Input
                         id="student-name"
                         type="text"
-                        placeholder="John Doe"
+                        placeholder="Arjun Kumar"
                         value={studentName}
                         onChange={(e) => setStudentName(e.target.value)}
                         className="bg-background"
@@ -139,7 +139,7 @@ export default function SignupPage() {
                       <Input
                         id="admin-name"
                         type="text"
-                        placeholder="Jane Smith"
+                        placeholder="Priya Menon"
                         value={adminName}
                         onChange={(e) => setAdminName(e.target.value)}
                         className="bg-background"
